@@ -1,29 +1,28 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
+using OverlayDisplayWhiteboard.Utility;
 using Raylib_cs;
 
 namespace OverlayDisplayWhiteboard;
 
 public class Pencil : Shape
 {
-	public const float MouseMoveThreshold = 0.95f;
-
-	private Vector2[] Points = new Vector2[512];
-	private int pointCount = 0;
+	private const int SmoothWindowSize = 4;
+	private const float MouseMoveThreshold = 0.95f;
+	private Vector2[] _points = new Vector2[512];
+	private int _pointCount = 0;
 	
 	private void AddPoint(Vector2 point)
 	{
-		if (Points.Length == pointCount)
+		if (_points.Length == _pointCount)
 		{
 			//reallocate more memory
-			var p = new Vector2[Points.Length * 2];
-			Array.Copy(Points, p, Points.Length);
-			Points = p;
+			Array.Resize(ref _points, _points.Length + 512);
 		}
 
 		_lastAddedPos = point;
-		Points[pointCount] = point;
-		pointCount++;
+		_points[_pointCount] = point;
+		_pointCount++;
 	}
 
 	private Vector2 _lastAddedPos;
@@ -35,7 +34,7 @@ public class Pencil : Shape
 			return;
 		}
 		AddPoint(mousePos);
-		Console.WriteLine(pointCount);
+		Console.WriteLine(_pointCount);
 	}
 	public override void DrawInProgress()
 	{
@@ -45,7 +44,7 @@ public class Pencil : Shape
 
 	public override void Draw()
 	{
-		Raylib.DrawLineStrip(Points, pointCount, Color);
+		Raylib.DrawLineStrip(_points, _pointCount, Color);
 	}
 
 	public override void Start(Vector2 pos)
@@ -55,6 +54,7 @@ public class Pencil : Shape
 
 	public override void Complete(Vector2 pos)
 	{
+		_points = PointUtility.Smooth(_points, _pointCount, SmoothWindowSize);
 		AddPoint(pos);
 	}
 }

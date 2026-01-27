@@ -125,7 +125,7 @@ public class Whiteboard : IInputHandler
 		}
 
 		//get active tool/selected shape.
-		var shape = new Pen();
+		var shape = new Pencil();
 		shape.Start(Raylib.GetMousePosition());
 		_inProgressShape = shape;
 	}
