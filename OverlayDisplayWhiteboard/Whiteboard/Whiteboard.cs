@@ -12,8 +12,9 @@ public class Whiteboard : IInputHandler
 	
 	//a whiteboard is a list of shapes and an in-progress shape.
 	private List<Shape> _shapes = new List<Shape>();
-	public Shape? _inProgressShape;
-	
+	private Shape? _inProgressShape;
+	private Func<Shape> _shapeFactory = ()=>new Pencil();
+	private Color ActiveColor = Color.Black;
 	public void Draw()
 	{
 		if (ClearBackground)
@@ -125,8 +126,19 @@ public class Whiteboard : IInputHandler
 		}
 
 		//get active tool/selected shape.
-		var shape = new Pencil();
+		var shape = _shapeFactory.Invoke();
+		shape.Color = ActiveColor;
 		shape.Start(Raylib.GetMousePosition());
 		_inProgressShape = shape;
+	}
+
+	public void SetShapeFactory(Func<Shape> func)
+	{
+		_shapeFactory = func;
+	}
+
+	public void SetColor(Color color)
+	{
+		ActiveColor = color;
 	}
 }

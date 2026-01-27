@@ -34,7 +34,6 @@ public class Pencil : Shape
 			return;
 		}
 		AddPoint(mousePos);
-		Console.WriteLine(_pointCount);
 	}
 	public override void DrawInProgress()
 	{

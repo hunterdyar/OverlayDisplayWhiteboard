@@ -22,14 +22,25 @@ public static class Program
 		Raylib.EndDrawing();
 
 		_whiteboard = new Whiteboard();
+		var toolUI = new ChooseToolUI(_whiteboard);
+		var colorUI = new ChooseColorUI(_whiteboard);
+		
+		//this list is ordered "top to button" intercepting mouse clicks.
+		_inputHandlers.Add(toolUI);
+		_inputHandlers.Add(colorUI);
 		_inputHandlers.Add(_whiteboard);
+		
 		while (!Raylib.WindowShouldClose())
 		{
 			//the list is ord
 			TickInput();
 			Raylib.BeginDrawing();
 			Raylib.ClearBackground(Color.White);
+			
 			_whiteboard.Draw();
+			toolUI.Draw();
+			colorUI.Draw();
+			
 			Raylib.DrawFPS(10,10);
 			//offset layout
 			Raylib.EndDrawing();
