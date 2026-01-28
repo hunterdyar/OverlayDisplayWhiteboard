@@ -3,6 +3,7 @@ using Windows.Media.Capture.Frames;
 using Windows.Graphics.Imaging;
 using Raylib_cs;
 using System.Runtime.InteropServices.WindowsRuntime;
+using OverlayDisplayWhiteboard.Utility;
 
 public class CaptureDisplay
 {
@@ -49,17 +50,30 @@ public class CaptureDisplay
 
         if (selectedGroup == null)
         {
-            throw new Exception("No capture device found");
+            Program.SetNoDeviceFound();
+            return;
         }
 
         var settings = new MediaCaptureInitializationSettings
         {
             SourceGroup = selectedGroup,
             MemoryPreference = MediaCaptureMemoryPreference.Cpu,
-            StreamingCaptureMode = StreamingCaptureMode.Video
+            StreamingCaptureMode = StreamingCaptureMode.Video,
         };
-
         await _mediaCapture.InitializeAsync(settings);
+
+        // Query all properties of the specified stream type 
+        IEnumerable<StreamPropertiesHelper> allStreamProperties =_mediaCapture.VideoDeviceController.GetAvailableMediaStreamProperties(MediaStreamType.VideoRecord).Select(x => new StreamPropertiesHelper(x));
+        // Order them by resolution then frame rate
+        allStreamProperties = allStreamProperties.OrderByDescending(x => x.Height * x.Width).ThenByDescending(x => x.FrameRate);
+
+        var properties = allStreamProperties.First();
+        //set chosen steam property.
+
+        await _mediaCapture.VideoDeviceController.SetMediaStreamPropertiesAsync(MediaStreamType.VideoPreview, properties.EncodingProperties);
+
+        Console.WriteLine($"Set Video to: {properties.Width}x{properties.Height}, {properties.FrameRate}");
+       
 
         // Get the color frame source
         var colorFrameSource = _mediaCapture.FrameSources[colorSourceInfo?.Id];
@@ -70,6 +84,10 @@ public class CaptureDisplay
 
         // Start reading frames
         await _frameReader.StartAsync();
+
+
+        
+        Program.SetDeviceFound();
     }
 
     private async void OnFrameArrived(MediaFrameReader sender, MediaFrameArrivedEventArgs args)
@@ -174,9 +192,9 @@ public class CaptureDisplay
 
     public void Dispose()
     {
-        _frameReader?.StopAsync().Wait();
+        _frameReader?.StopAsync();//.Wait() was freezing things. so that's probably a bug....
+        _mediaCapture?.Dispose(); 
         _frameReader?.Dispose();
-        _mediaCapture?.Dispose();
         
         if (_texture.Id != 0)
         {

@@ -4,13 +4,23 @@ using static Raylib_cs.Raylib;
 using OverlayDisplayWhiteboard;
 using Raylib_cs;
 
+public enum ProgramState
+{
+	Uninitialized,
+	NoDeviceFound,
+	DeviceFoundNoTexture,
+	OverlayWhiteboard,
+	CleanWhiteboard,
+}
 public static class Program
 {
 	static CaptureDisplay _capture;
 	private static Whiteboard _whiteboard;
 	private static List<IInputHandler> _inputHandlers = new List<IInputHandler>();
 	public static string DeviceName;
-
+	public static ProgramState ProgramState => _programState;
+	private static ProgramState _programState = ProgramState.Uninitialized;
+	private static double _errorTime = 0;
 	public static async Task Main(string[] args)
 	{
 		if ((args.Length > 1))
@@ -50,39 +60,59 @@ public static class Program
 		_inputHandlers.Add(colorUI);
 		_inputHandlers.Add(_whiteboard);
 
+		if (_programState == ProgramState.Uninitialized)
+		{
+			//_capture should set this to either nodevice or overlayWhiteboard. whats going oon?
+			Console.WriteLine("Something isn't right.... marching forward anyway!");
+		}
+
 		while (!Raylib.WindowShouldClose())
 		{
 			//the list is ord
-		
-			_capture.UpdateTexture();
+			if (_programState != ProgramState.NoDeviceFound && _programState != ProgramState.CleanWhiteboard)
+			{
+				_capture.UpdateTexture();
+			}
+
 			TickInput();
 			Raylib.BeginDrawing();
 			Raylib.ClearBackground(Color.White);
 
 			//draw window
-			var texture = _capture.Texture;
-			if (texture.Id != 0)
+			if (_programState == ProgramState.OverlayWhiteboard)
 			{
-				Raylib.DrawTexture(texture, 0, 0, Color.White);
+				var texture = _capture.Texture;
+				if (texture.Id != 0)
+				{
+					Raylib.DrawTexture(texture, 0, 0, Color.White);
+
+				}
 			}
-			else
+			else if (_programState == ProgramState.NoDeviceFound)
 			{
-				Raylib.DrawText("Capture Device Loading or not found or idk", 100,150,35,Color.DarkGreen);	
+				Raylib.DrawText($"Capture Device not found. Trying again in {_errorTime.ToString("N0")}", 100, 150,
+					35, Color.DarkGreen);
+				_errorTime -= Raylib.GetFrameTime();
+				if (_errorTime >= 0)
+				{
+					await _capture.InitializeAsync();
+					_errorTime = 10;
+				}
 			}
 
-			//draw program
-			_whiteboard.Draw();
-			toolUI.Draw();
-			colorUI.Draw();
+				//draw program
+				_whiteboard.Draw();
+				toolUI.Draw();
+				colorUI.Draw();
 
-			Raylib.DrawFPS(10, 10);
-			//offset layout
-			Raylib.EndDrawing();
+				Raylib.DrawFPS(10, 10);
+				//offset layout
+				Raylib.EndDrawing();
 		}
 
 		_capture.Dispose();
 		Raylib.CloseWindow();
-	}
+		}
 
 	private static void TickInput()
 	{
@@ -93,5 +123,15 @@ public static class Program
 				break;
 			}
 		}
+	}
+
+	public static void SetNoDeviceFound()
+	{
+		_programState = ProgramState.NoDeviceFound;
+	}
+
+	public static void SetDeviceFound()
+	{
+		_programState = ProgramState.OverlayWhiteboard;
 	}
 }
