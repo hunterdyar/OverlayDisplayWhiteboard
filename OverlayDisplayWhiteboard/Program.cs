@@ -14,11 +14,11 @@ public enum ProgramState
 }
 public static class Program
 {
-	static CaptureDisplay _capture;
-	private static Whiteboard _whiteboard;
-	private static MTWhiteboard _mtWhiteboard;
+	static CaptureDisplay _capture = new CaptureDisplay();
+	private static Whiteboard _whiteboard = new Whiteboard();
+	private static MTWhiteboard _mtWhiteboard = new MTWhiteboard();
 	private static List<IInputHandler> _inputHandlers = new List<IInputHandler>();
-	public static string DeviceName;
+	public static string DeviceName = "";
 	public static ProgramState ProgramState => _programState;
 	private static ProgramState _programState = ProgramState.Uninitialized;
 	private static double _errorTime = 0;
@@ -38,8 +38,6 @@ public static class Program
 
 	private static async Task Run()
 	{
-
-		_capture = new CaptureDisplay();
 		await _capture.InitializeAsync();
 
 		Raylib.InitWindow(1920, 1080, "Whiteboard");
