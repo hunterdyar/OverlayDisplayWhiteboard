@@ -27,6 +27,10 @@ public class CaptureDisplay
         // Find a color video source
         foreach (var sourceGroup in frameSourceGroups)
         {
+            if (!sourceGroup.DisplayName.Contains(Program.DeviceName))
+            {
+                continue;
+            }
             foreach (var sourceInfo in sourceGroup.SourceInfos)
             {
                 if (sourceInfo.SourceKind == MediaFrameSourceKind.Color)
@@ -72,7 +76,9 @@ public class CaptureDisplay
     {
         using var frame = sender.TryAcquireLatestFrame();
         if (frame?.VideoMediaFrame == null)
+        {
             return;
+        }
 
         var videoFrame = frame.VideoMediaFrame;
         var softwareBitmap = videoFrame.SoftwareBitmap;
@@ -171,6 +177,7 @@ public class CaptureDisplay
         _frameReader?.StopAsync().Wait();
         _frameReader?.Dispose();
         _mediaCapture?.Dispose();
+        
         if (_texture.Id != 0)
         {
             Raylib.UnloadTexture(_texture);

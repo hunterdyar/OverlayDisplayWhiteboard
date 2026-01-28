@@ -6,9 +6,6 @@ namespace OverlayDisplayWhiteboard;
 public class Whiteboard : IInputHandler
 {
 	//i thiiiink we're assuming screen space and 1unit->1px scaling?
-
-	public bool ClearBackground;
-	public Color ClearColor = Color.White;
 	
 	//a whiteboard is a list of shapes and an in-progress shape.
 	private List<Shape> _shapes = new List<Shape>();
@@ -17,10 +14,6 @@ public class Whiteboard : IInputHandler
 	private Color ActiveColor = Color.Black;
 	public void Draw()
 	{
-		if (ClearBackground)
-		{
-			Raylib.ClearBackground(ClearColor);
-		}
 
 		foreach (var shape in _shapes)
 		{

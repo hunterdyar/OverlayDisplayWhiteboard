@@ -8,21 +8,32 @@ public static class Program
 {
 	static CaptureDisplay _capture;
 	private static Whiteboard _whiteboard;
-	private static List<IInputHandler> _inputHandlers = new List<IInputHandler>(
+	private static List<IInputHandler> _inputHandlers = new List<IInputHandler>();
+	public static string DeviceName;
 
-	
 	public static async Task Main(string[] args)
 	{
-		Run();
+		if ((args.Length > 1))
+		{
+			DeviceName = args[1];
+		}
+		else
+		{
+			DeviceName = "Elgato 4K S";
+		}
+
+		await Run();
 	}
 
-	private static void Run()
+	private static async Task Run()
 	{
+
 		_capture = new CaptureDisplay();
 		await _capture.InitializeAsync();
 
-		Raylib.SetTargetFPS(60);
-		Raylib.InitWindow(1920, 1080, "Grid Viewer");
+		Raylib.InitWindow(1920, 1080, "Whiteboard");
+
+		//Raylib.SetTargetFPS(60);
 		SetConfigFlags(ConfigFlags.BorderlessWindowMode);
 
 		Raylib.BeginDrawing();
@@ -33,35 +44,42 @@ public static class Program
 		_whiteboard = new Whiteboard();
 		var toolUI = new ChooseToolUI(_whiteboard);
 		var colorUI = new ChooseColorUI(_whiteboard);
-		
+
 		//this list is ordered "top to button" intercepting mouse clicks.
 		_inputHandlers.Add(toolUI);
 		_inputHandlers.Add(colorUI);
 		_inputHandlers.Add(_whiteboard);
-		
+
 		while (!Raylib.WindowShouldClose())
 		{
 			//the list is ord
+		
+			_capture.UpdateTexture();
 			TickInput();
 			Raylib.BeginDrawing();
 			Raylib.ClearBackground(Color.White);
-			
+
 			//draw window
 			var texture = _capture.Texture;
 			if (texture.Id != 0)
 			{
 				Raylib.DrawTexture(texture, 0, 0, Color.White);
 			}
+			else
+			{
+				Raylib.DrawText("Capture Device Loading or not found or idk", 100,150,35,Color.DarkGreen);	
+			}
 
 			//draw program
 			_whiteboard.Draw();
 			toolUI.Draw();
 			colorUI.Draw();
-			
-			Raylib.DrawFPS(10,10);
+
+			Raylib.DrawFPS(10, 10);
 			//offset layout
 			Raylib.EndDrawing();
 		}
+
 		_capture.Dispose();
 		Raylib.CloseWindow();
 	}
@@ -75,5 +93,5 @@ public static class Program
 				break;
 			}
 		}
-	
+	}
 }
