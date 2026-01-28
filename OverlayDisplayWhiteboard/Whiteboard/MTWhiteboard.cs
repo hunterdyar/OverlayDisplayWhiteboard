@@ -38,6 +38,7 @@ public class MTWhiteboard : IInputHandler
 				Raylib.DrawText(i.ToString(), (int)_touchPositions[i].X - 10, (int)_touchPositions[i].Y - 70, 40, Color.Black);
 			}
 		}
+		Raylib.DrawText(touchCount.ToString(),30,35,24,Color.Orange);
 	}
 
 	public bool Tick()
@@ -52,6 +53,8 @@ public class MTWhiteboard : IInputHandler
 		{
 			_touchPositions[i] = Raylib.GetTouchPosition(i);
 		}
+		
+		//also, the mouse!
 		
 		return touchCount > 0;
 	}
