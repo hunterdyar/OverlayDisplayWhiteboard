@@ -16,6 +16,7 @@ public static class Program
 {
 	static CaptureDisplay _capture;
 	private static Whiteboard _whiteboard;
+	private static MTWhiteboard _mtWhiteboard;
 	private static List<IInputHandler> _inputHandlers = new List<IInputHandler>();
 	public static string DeviceName;
 	public static ProgramState ProgramState => _programState;
@@ -52,13 +53,16 @@ public static class Program
 		Raylib.EndDrawing();
 
 		_whiteboard = new Whiteboard();
+		_mtWhiteboard = new MTWhiteboard();
 		var toolUI = new ChooseToolUI(_whiteboard);
 		var colorUI = new ChooseColorUI(_whiteboard);
 
 		//this list is ordered "top to button" intercepting mouse clicks.
 		_inputHandlers.Add(toolUI);
 		_inputHandlers.Add(colorUI);
-		_inputHandlers.Add(_whiteboard);
+		
+		// _inputHandlers.Add(_whiteboard);
+		_inputHandlers.Add(_mtWhiteboard);
 
 		if (_programState == ProgramState.Uninitialized)
 		{
@@ -93,7 +97,7 @@ public static class Program
 				Raylib.DrawText($"Capture Device not found. Trying again in {_errorTime.ToString("N0")}", 100, 150,
 					35, Color.DarkGreen);
 				_errorTime -= Raylib.GetFrameTime();
-				if (_errorTime >= 0)
+				if (_errorTime <= 0)
 				{
 					await _capture.InitializeAsync();
 					_errorTime = 10;
@@ -101,7 +105,7 @@ public static class Program
 			}
 
 				//draw program
-				_whiteboard.Draw();
+				_mtWhiteboard.Draw();
 				toolUI.Draw();
 				colorUI.Draw();
 

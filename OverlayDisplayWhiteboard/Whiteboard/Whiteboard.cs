@@ -14,7 +14,6 @@ public class Whiteboard : IInputHandler
 	private Color ActiveColor = Color.Black;
 	public void Draw()
 	{
-
 		foreach (var shape in _shapes)
 		{
 			shape.Draw();
@@ -47,7 +46,6 @@ public class Whiteboard : IInputHandler
 	}
 	//just a helper
 	private static MouseState GetLeftMouseButtonState() => Raylib.IsMouseButtonDown(MouseButton.Left) ? MouseState.Down : MouseState.Up;
-	
 	private MouseState _mouseState = GetLeftMouseButtonState();
 	public bool Tick()
 	{
