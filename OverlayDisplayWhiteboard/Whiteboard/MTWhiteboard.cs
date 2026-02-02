@@ -1,4 +1,6 @@
 ﻿using System.Numerics;
+using Windows.Devices.Input;
+using Linearstar.Windows.RawInput;
 using Raylib_cs;
 
 namespace OverlayDisplayWhiteboard;
@@ -13,8 +15,18 @@ public class MTWhiteboard : IInputHandler
 	private int touchCount = 0;
 	private Vector2[] _touchPositions = new Vector2[MaxTouchCount];
 
+	//https://learn.microsoft.com/en-us/uwp/api/windows.ui.input.inking.inkstrokebuilder?view=winrt-26100
+	private Windows.Devices.Input.TouchCapabilities capabilities = new TouchCapabilities();
+	public MTWhiteboard()
+	{
+		unsafe
+		{
+			RawInputDevice.RegisterDevice(HidUsageAndPage.TouchScreen, RawInputDeviceFlags.None, (IntPtr)Raylib.GetWindowHandle());
+		}
+	}
 	public void Draw()
 	{
+		
 		foreach (var shape in _shapes)
 		{
 			shape.Draw();
@@ -38,7 +50,10 @@ public class MTWhiteboard : IInputHandler
 				Raylib.DrawText(i.ToString(), (int)_touchPositions[i].X - 10, (int)_touchPositions[i].Y - 70, 40, Color.Black);
 			}
 		}
-		Raylib.DrawText(touchCount.ToString(),30,35,24,Color.Orange);
+
+
+		Raylib.DrawText($"detected: {capabilities.TouchPresent.ToString()}. touch device min num contacts: {capabilities.Contacts}",30,95,24,Color.Orange);
+		
 	}
 
 	public bool Tick()
@@ -54,7 +69,6 @@ public class MTWhiteboard : IInputHandler
 			_touchPositions[i] = Raylib.GetTouchPosition(i);
 		}
 		
-		//also, the mouse!
 		
 		return touchCount > 0;
 	}

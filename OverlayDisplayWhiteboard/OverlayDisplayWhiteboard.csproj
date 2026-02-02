@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="RawInput.Sharp" Version="0.1.3" />
       <PackageReference Include="Raylib-cs" Version="7.0.2" />
     </ItemGroup>
 
