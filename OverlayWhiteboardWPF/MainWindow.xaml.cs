@@ -21,10 +21,14 @@ public partial class MainWindow : Window
 	{
 		InitializeComponent();
 		// TheInkCanvas.SetEnabledGestures();
-		this.IsManipulationEnabled = true;
 		this.WindowState = WindowState.Maximized;
 		this.WindowStyle = WindowStyle.None;
 		this.Topmost = true;
+		CaptureControl.Loaded += (s,e) => { UpdateStatus(); };
+		// Update status when capturing changes
+		var descriptor = System.ComponentModel.DependencyPropertyDescriptor.FromProperty(MediaCaptureControls.MediaCaptureControl.IsCapturingProperty, typeof(MediaCaptureControls.MediaCaptureControl));
+
+		descriptor?.AddValueChanged(CaptureControl, (s, e) => { UpdateStatus(); });
 	}
 	// Set the EditingMode to ink input.
 	private void Ink(object sender, RoutedEventArgs e)
@@ -64,5 +68,43 @@ public partial class MainWindow : Window
 	private void Clear(object sender, RoutedEventArgs e)
 	{
 		TheInkCanvas.Strokes.Clear();
+	}
+
+	private void DeviceIndexCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+	{
+		// if (CaptureControl != null && DeviceIndexCombo.SelectedIndex >= 0)
+		// {
+		// 	System.Diagnostics.Debug.WriteLine($"Now switching to capture control device index {DeviceIndexCombo.SelectedIndex}");
+		// 	CaptureControl.DeviceIndex = DeviceIndexCombo.SelectedIndex;
+		// }
+	}
+
+	// private void StretchCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+	// {
+	// 	if (CaptureControl != null && StretchCombo.SelectedItem is ComboBoxItem item)
+	// 	{
+	// 		CaptureControl.Stretch = item.Content.ToString() switch
+	// 		{
+	// 			"Uniform" => Stretch.Uniform,
+	// 			"Fill" => Stretch.Fill,
+	// 			"UniformToFill" => Stretch.UniformToFill,
+	// 			"None" => Stretch.None,
+	// 			_ => Stretch.Uniform
+	// 		};
+	// 	}
+	// }
+
+	private void UpdateStatus()
+	{
+		if (StatusText != null)
+		{
+			// StatusText.Text = CaptureControl.IsCapturing
+			// 	? $"Status: Capturing ({CaptureControl.DeviceIndex})"
+			// 	: "Status: No Signal";
+			//
+			// StatusText.Foreground = CaptureControl.IsCapturing
+			// 	? new SolidColorBrush(Colors.Green)
+			// 	: new SolidColorBrush(Colors.Red);
+		}
 	}
 }

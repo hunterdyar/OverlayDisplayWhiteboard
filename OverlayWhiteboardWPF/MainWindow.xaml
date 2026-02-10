@@ -4,21 +4,50 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OverlayWhiteboardWPF"
+        xmlns:mediaCaptureControls="clr-namespace:MediaCaptureControls"
+        xmlns:elgatoCaptureControl="clr-namespace:ElgatoCaptureControl"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800"
+        Background="AntiqueWhite">
     <Grid>
-        <local:DisplayCapture />
+
+        <elgatoCaptureControl:ElgatoCaptureControl
+            DeviceId="5"
+            x:Name="CaptureControl" 
+            />
+        <!-- <mediaCaptureControls:MediaCaptureControl -->
+        <!--     x:Name="CaptureControl" -->
+        <!--     DeviceIndex="5" -->
+        <!--     BorderBrush="#333" -->
+        <!--     BorderThickness="1" /> -->
+        
         <InkCanvas Name="TheInkCanvas" Background="Transparent">
             <InkCanvas.DefaultDrawingAttributes>
                 <DrawingAttributes xmlns:ink="system-windows-ink" Color="Red" Width="5" />
             </InkCanvas.DefaultDrawingAttributes>
         </InkCanvas>
-        <StackPanel Name="buttonBar" VerticalAlignment="Top" Height="26" Orientation="Horizontal" Margin="5">
-            <Button Click="Ink">Ink</Button>
-            <Button Click="Highlight">Highlight</Button>
-            <Button Click="EraseStroke">EraseStroke</Button>
-            <Button Click="Select">Select</Button>
-            <Button Click="Clear">Clear</Button>
+        
+        <StackPanel Name="buttonBar" VerticalAlignment="Top" Height="36" Orientation="Horizontal" Margin="5">
+            <ComboBox x:Name="DeviceIndexCombo"
+                      Width="100"
+                      SelectedIndex="5"
+                      SelectionChanged="DeviceIndexCombo_SelectionChanged">
+                <ComboBoxItem Content="0" />
+                <ComboBoxItem Content="1" />
+                <ComboBoxItem Content="2" />
+                <ComboBoxItem Content="3" />
+                <ComboBoxItem Content="4" />
+                <ComboBoxItem Content="5" />
+                <ComboBoxItem Content="6" />
+            </ComboBox>
+            <local:TouchButton Click="Ink">Ink</local:TouchButton>
+            <local:TouchButton Click="Highlight">Highlight</local:TouchButton>
+            <local:TouchButton Click="EraseStroke">EraseStroke</local:TouchButton>
+            <local:TouchButton Click="Select">Select</local:TouchButton>
+            <local:TouchButton Click="Clear">Clear</local:TouchButton>
+            <TextBox Name="StatusText">status</TextBox>
         </StackPanel>
+        
+      
     </Grid>
 </Window>
